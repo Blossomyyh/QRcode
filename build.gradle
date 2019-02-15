@@ -15,10 +15,13 @@ buildscript {
 }
 
 allprojects {
+    //check all the indicated repositories before sync
     repositories {
         google()
         jcenter()
-        
+        maven {
+            url "http://download.dynamsoft.com/maven/dbr/aar"
+        }
     }
 }
 
