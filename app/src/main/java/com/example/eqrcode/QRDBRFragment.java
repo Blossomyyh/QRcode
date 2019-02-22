@@ -136,18 +136,6 @@ public class QRDBRFragment extends Fragment implements ActivityCompat.OnRequestP
      * camera preview into a TextureView:</p>
      *
      *
-     * <p>A TextureView's SurfaceTexture can be obtained either by invoking
-     * {@link #getSurfaceTexture()} or by using a {@link TextureView.SurfaceTextureListener}.
-     * It is important to know that a SurfaceTexture is available only after the
-     * TextureView is attached to a window (and {@link #onAttachedToWindow()} has
-     * been invoked.) It is therefore highly recommended you use a listener to
-     * be notified when the SurfaceTexture becomes available.</p>
-     *
-     * <p>It is important to note that only one producer can use the TextureView.
-     * For instance, if you use a TextureView to display the camera preview, you
-     * cannot use {@link #lockCanvas()} to draw onto the TextureView at the same
-     * time.</p>
-     *
      * @see SurfaceView
      * @see SurfaceTexture
      */
@@ -155,7 +143,7 @@ public class QRDBRFragment extends Fragment implements ActivityCompat.OnRequestP
     private final TextureView.SurfaceTextureListener mSurfaceTestureListener = new TextureView.SurfaceTextureListener() {
         @Override
         public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-//            openCamera
+            openCamera(width,height);
         }
 
         @Override
@@ -170,8 +158,9 @@ public class QRDBRFragment extends Fragment implements ActivityCompat.OnRequestP
 
         @Override
         public void onSurfaceTextureUpdated(SurfaceTexture surface) {
+
         }
-    }
+    };
 
     /**
      *
