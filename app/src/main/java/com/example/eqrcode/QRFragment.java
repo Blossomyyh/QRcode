@@ -83,11 +83,18 @@ public class QRFragment extends Fragment {
 
     }
 
+    // camera.startBackgroundThread
     @Override
     public void onResume() {
         super.onResume();
         Log.e(TAG, "onResume");
         camera.startBackgroundThread();
+        createDetector();
+        if (textureView.isAvailable()){
+            camera.openCamera(getActivity());
+        } else {
+            textureView.setSurfaceTextureListener(textureListener);
+        }
 
     }
 

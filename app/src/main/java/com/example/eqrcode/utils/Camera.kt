@@ -29,14 +29,14 @@ class Camera
 /**
  * to set up the camera
  */
-(private val view: View, val context: Context) {
+(private val view: View, var context: Context) {
     //var： var是一个可变变量，这是一个可以通过重新分配来更改为另一个值的变量。这种声明变量的方式和Java中声明变量的方式一样。
     //val: val是一个只读变量，这种声明变量的方式相当于java中的final变量。一个val创建的时候必须初始化，因为以后不能被改变。
     private var cameraId: String? = null
     private var imageDimension: Size? = null
     protected var cameraCaptureSession: CameraCaptureSession? = null
     protected var captureRequestBuilder: CaptureRequest.Builder? = null
-    protected var cameraDevice : CameraDevice? = null
+    protected var cameraDevice: CameraDevice? = null
     private var handlerBackground: Handler? = null
     private var handlerThread: HandlerThread? = null
     private var textureView: TextureView? = null
@@ -47,24 +47,21 @@ class Camera
 
     private val aInt by lazy { 10 }
 
-//    private var mImageAvailableListener = ImageReader.OnImageAvailableListener{
-//        reader: ImageReader? ->
-//        var image: Image? = reader?.acquireNextImage() ?: return@OnImageAvailableListener
-//        barcodeDetector!!.receiveFrame(Frame.Builder().setBitmap(this.textureView?.bitmap).build())
-//        image?.close()
-//    }
+    private val mImageAvailableListener = ImageReader.OnImageAvailableListener { reader ->
+        val mImage = reader.acquireNextImage() ?: return@OnImageAvailableListener
 
-    private var mImageAvailableListener = ImageReader.OnImageAvailableListener {
-
+        Log.d(TAG, Thread.currentThread().toString())
+        barcodeDetector?.receiveFrame(Frame.Builder().setBitmap(textureView?.bitmap).build())
+        mImage.close()
     }
 
-     val cameraCaptureSessionListener = object : CameraCaptureSession.CaptureCallback() {
+    val cameraCaptureSessionListener = object : CameraCaptureSession.CaptureCallback() {
         override fun onCaptureCompleted(session: CameraCaptureSession, request: CaptureRequest, result: TotalCaptureResult) {
             super.onCaptureCompleted(session, request, result)
         }
     }
 
-    private val cameraStateCallcack  = object : CameraDevice.StateCallback(){
+    private val cameraStateCallcack = object : CameraDevice.StateCallback() {
         override fun onDisconnected(camera: CameraDevice) {
             cameraDevice?.close()
         }
@@ -94,15 +91,15 @@ class Camera
     fun createCameraPreview() {
         try {
             val texture: SurfaceTexture = textureView!!.surfaceTexture
-            if (texture != null){
+            if (texture != null) {
                 //Set the default size of the image buffers.
-                texture.setDefaultBufferSize(imageDimension!!.width/4, imageDimension!!.width/4)
+                texture.setDefaultBufferSize(imageDimension!!.width / 4, imageDimension!!.width / 4)
 
                 val surface: Surface = Surface(texture)
-//                cameraDevice?.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)
+                cameraDevice?.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)
                 captureRequestBuilder = cameraDevice?.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)
 
-                imageReader = ImageReader.newInstance(imageDimension!!.width/4, imageDimension!!.width/4, ImageFormat.YUV_420_888,1)
+                imageReader = ImageReader.newInstance(imageDimension!!.width / 4, imageDimension!!.width / 4, ImageFormat.YUV_420_888, 1)
                 imageReader?.setOnImageAvailableListener(mImageAvailableListener, handlerBackground)
 
                 captureRequestBuilder?.addTarget(surface)
@@ -110,7 +107,9 @@ class Camera
 
                 cameraDevice!!.createCaptureSession(Arrays.asList(surface, imageReader!!.surface), object : CameraCaptureSession.StateCallback() {
                     override fun onConfigured(session: CameraCaptureSession) {
-                        if (null == cameraDevice){return}
+                        if (null == cameraDevice) {
+                            return
+                        }
                         cameraCaptureSession = session
                         updatePreview(cameraCaptureSessionListener)
                     }
@@ -118,11 +117,11 @@ class Camera
                     override fun onConfigureFailed(session: CameraCaptureSession) {
                         Toast.makeText(context, "configuration change", Toast.LENGTH_SHORT).show()
                     }
-                },null)
+                }, null)
 
             }
 
-        }catch (e: CameraAccessException){
+        } catch (e: CameraAccessException) {
             e.printStackTrace()
         }
     }
@@ -156,13 +155,13 @@ class Camera
             imageDimension = configs.getOutputSizes(SurfaceTexture::class.java)[0]
 
             // Add permission for camera and let user grant the permission
-            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ){
+            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(context, arrayOf(Manifest.permission.CAMERA), REQUEST_CAMERA_PERMISSION)
                 return
             }
 
             manager.openCamera(cameraId, cameraStateCallcack, null)
-        } catch (e: CameraAccessException){
+        } catch (e: CameraAccessException) {
             e.printStackTrace()
         }
         Log.e(TAG, "openCamera")
@@ -170,14 +169,14 @@ class Camera
     }
 
     fun updatePreview(listener: CameraCaptureSession.CaptureCallback) {
-        if (null == cameraDevice){
+        if (null == cameraDevice) {
             Log.e(TAG, "updatePreview error, return")
         }
         captureRequestBuilder!!.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO)
 
         try {
             cameraCaptureSession!!.setRepeatingRequest(captureRequestBuilder!!.build(), listener, handlerBackground)
-        } catch (e: CameraAccessException){
+        } catch (e: CameraAccessException) {
             e.printStackTrace()
         }
     }
@@ -189,7 +188,7 @@ class Camera
 
         }
 
-        if (null != imageReader){
+        if (null != imageReader) {
             imageReader?.close()
             imageReader = null
         }
@@ -209,7 +208,7 @@ class Camera
             handlerThread!!.join()
             handlerThread = null
             handlerBackground = null
-        }catch (e : InterruptedException){
+        } catch (e: InterruptedException) {
             e.printStackTrace()
         }
     }
@@ -218,7 +217,6 @@ class Camera
         private val TAG = "BARCODE"
         private val REQUEST_CAMERA_PERMISSION = 200
     }
-
 
 
 }
