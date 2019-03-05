@@ -31,3 +31,5 @@
 ##### Barcode + camera2
 
 ![activity](./activity.png)
+
+ 
