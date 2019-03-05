@@ -40,13 +40,6 @@ public class QRFragment extends Fragment {
         editText = view.findViewById(R.id.textQR);
         textureView = view.findViewById(R.id.textureView);
 
-//        textureView.post(new Runnable() {
-//            @Override
-//            public void run() {
-//
-//            }
-//        });
-
         // todo: initiate CAMERA
         this.camera = new Camera(view, getContext());
         textureView.setSurfaceTextureListener(textureListener);
@@ -83,7 +76,6 @@ public class QRFragment extends Fragment {
 
     }
 
-    // camera.startBackgroundThread
     @Override
     public void onResume() {
         super.onResume();
@@ -128,7 +120,5 @@ public class QRFragment extends Fragment {
 
 
     }
-
-    //    private void releaseCamera(){ }
 
 }
